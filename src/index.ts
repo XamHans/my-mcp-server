@@ -5,16 +5,19 @@ import { z } from 'zod';
 // Define the Env interface
 export interface Env {
   DB_URL?: string;
-  [key: string]: any; // Allow for any other environment variables
+  [key: string]: any;
 }
-
-// Create a global context to store environment variables
-export const globalContext = {
-  env: {} as Env,
-};
 
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
+  // Static environment property
+  static env: Env = {};
+
+  // Simple static setter
+  static setEnv(env: Env): void {
+    this.env = env;
+  }
+
   server = new McpServer({
     name: 'Authless Calculator',
     version: '1.0.0',
@@ -26,9 +29,8 @@ export class MyMCP extends McpAgent {
       'add',
       { a: z.number(), b: z.number() },
       async ({ a, b }) => {
-        // Access environment variables from the global context
-        console.log('DB URL from global context:', globalContext.env.DB_URL);
-
+        // Access environment through the static property
+        console.log('DB URL:', MyMCP.env.DB_URL);
         return {
           content: [{ type: 'text', text: String(a + b) }],
         };
@@ -48,8 +50,8 @@ export class MyMCP extends McpAgent {
         console.log('Operation:', operation);
         console.log('Numbers:', a, b);
 
-        // Access environment variables from the global context
-        console.log('DB URL from global context:', globalContext.env.DB_URL);
+        // Access environment through the static property
+        console.log('DB URL:', MyMCP.env.DB_URL);
 
         switch (operation) {
           case 'add':
@@ -85,8 +87,8 @@ export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
-    // Set the environment variables in the global context
-    globalContext.env = env;
+    // Set environment variables using the static setter
+    MyMCP.setEnv(env);
 
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
       return MyMCP.serveSSE('/sse').fetch(request, env, ctx);
