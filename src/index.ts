@@ -9,13 +9,10 @@ export interface Env {
 }
 
 // Define our MCP agent with tools
-export class MyMCP extends McpAgent {
-  // Static environment property
-  static env: Env = {};
-
-  // Simple static setter
-  static setEnv(env: Env): void {
-    this.env = env;
+export class MyMCP extends McpAgent<Env> {
+  // The constructor should call super with ctx and env
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
   }
 
   server = new McpServer({
@@ -29,8 +26,8 @@ export class MyMCP extends McpAgent {
       'add',
       { a: z.number(), b: z.number() },
       async ({ a, b }) => {
-        // Access environment through the static property
-        console.log('DB URL:', MyMCP.env.DB_URL);
+        // Access environment variables through 'this' context
+        console.log('DB URL:', this.env.DB_URL);
         return {
           content: [{ type: 'text', text: String(a + b) }],
         };
@@ -50,8 +47,8 @@ export class MyMCP extends McpAgent {
         console.log('Operation:', operation);
         console.log('Numbers:', a, b);
 
-        // Access environment through the static property
-        console.log('DB URL:', MyMCP.env.DB_URL);
+        // Access environment through 'this' context
+        console.log('DB URL:', this.env.DB_URL);
 
         switch (operation) {
           case 'add':
@@ -83,13 +80,12 @@ export class MyMCP extends McpAgent {
   }
 }
 
+// Update the fetch handler
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
-    // Set environment variables using the static setter
-    MyMCP.setEnv(env);
-
+    // Use the static methods properly
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
       return MyMCP.serveSSE('/sse').fetch(request, env, ctx);
     }
