@@ -3,11 +3,18 @@ import { McpAgent } from 'agents/mcp';
 import { z } from 'zod';
 
 // Define our MCP agent with tools
+// @ts-ignore
 export class MyMCP extends McpAgent {
+  private env: any;
+
   server = new McpServer({
     name: 'Authless Calculator',
     version: '1.0.0',
   });
+
+  setEnv(env: any): void {
+    this.env = env;
+  }
 
   async init() {
     // Simple addition tool
@@ -31,6 +38,8 @@ export class MyMCP extends McpAgent {
         let result: number;
         console.log('Operation:', operation);
         console.log('Numbers:', a, b);
+        console.log('Request URL:', this.env.DB_URL);
+
         switch (operation) {
           case 'add':
             result = a + b;
@@ -64,15 +73,18 @@ export class MyMCP extends McpAgent {
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
-
+    // @ts-ignore
+    const myMcp = new MyMCP();
+    //pass down the env to the mcp server
+    myMcp.setEnv(env);
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
       // @ts-ignore
-      return MyMCP.serveSSE('/sse').fetch(request, env, ctx);
+      return myMcp.serveSSE('/sse').fetch(request, env, ctx);
     }
 
     if (url.pathname === '/mcp') {
       // @ts-ignore
-      return MyMCP.serve('/mcp').fetch(request, env, ctx);
+      return myMcp.serve('/mcp').fetch(request, env, ctx);
     }
 
     return new Response('Not found', { status: 404 });
