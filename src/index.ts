@@ -84,9 +84,10 @@ export class MyMCP extends McpAgent {
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
-
+    console.log('env', env);
     // Set the environment variables in the global context
     globalContext.env = env;
+    console.log('globalContext', globalContext);
 
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
       return MyMCP.serveSSE('/sse').fetch(request, env, ctx);
