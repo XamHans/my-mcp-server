@@ -2,27 +2,37 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { McpAgent } from 'agents/mcp';
 import { z } from 'zod';
 
+// Define the Env interface
+export interface Env {
+  DB_URL?: string;
+  [key: string]: any; // Allow for any other environment variables
+}
+
+// Create a global context to store environment variables
+export const globalContext = {
+  env: {} as Env,
+};
+
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
-  private static env: any;
-
   server = new McpServer({
     name: 'Authless Calculator',
     version: '1.0.0',
   });
-
-  static setEnv(env: any): void {
-    this.env = env;
-  }
 
   async init() {
     // Simple addition tool
     this.server.tool(
       'add',
       { a: z.number(), b: z.number() },
-      async ({ a, b }) => ({
-        content: [{ type: 'text', text: String(a + b) }],
-      })
+      async ({ a, b }) => {
+        // Access environment variables from the global context
+        console.log('DB URL from global context:', globalContext.env.DB_URL);
+
+        return {
+          content: [{ type: 'text', text: String(a + b) }],
+        };
+      }
     );
 
     // Calculator tool with multiple operations
@@ -37,7 +47,9 @@ export class MyMCP extends McpAgent {
         let result: number;
         console.log('Operation:', operation);
         console.log('Numbers:', a, b);
-        console.log('DB  URL from env variables:', MyMCP.env.DB_URL);
+
+        // Access environment variables from the global context
+        console.log('DB URL from global context:', globalContext.env.DB_URL);
 
         switch (operation) {
           case 'add':
@@ -72,15 +84,15 @@ export class MyMCP extends McpAgent {
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
-    MyMCP.setEnv(env);
+
+    // Set the environment variables in the global context
+    globalContext.env = env;
 
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
-      // @ts-ignore
       return MyMCP.serveSSE('/sse').fetch(request, env, ctx);
     }
 
     if (url.pathname === '/mcp') {
-      // @ts-ignore
       return MyMCP.serve('/mcp').fetch(request, env, ctx);
     }
 
