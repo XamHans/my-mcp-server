@@ -54,7 +54,7 @@ export class MyMCP extends McpAgent {
             result = a / b;
             break;
         }
-        console.log('Result:', result);
+        console.log('Final Result:', result);
         return { content: [{ type: 'text', text: String(result) }] };
       }
     );
