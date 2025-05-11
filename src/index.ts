@@ -88,18 +88,12 @@ export default {
     // Set the environment variables in the global context
     globalContext.env = env;
 
-    // Create a new MCP instance
-    const mcp = new MyMCP();
-
-    // Initialize it
-    mcp.init();
-
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
-      return mcp.serveSSE('/sse').fetch(request, env, ctx);
+      return MyMCP.serveSSE('/sse').fetch(request, env, ctx);
     }
 
     if (url.pathname === '/mcp') {
-      return mcp.serve('/mcp').fetch(request, env, ctx);
+      return MyMCP.serve('/mcp').fetch(request, env, ctx);
     }
 
     return new Response('Not found', { status: 404 });
