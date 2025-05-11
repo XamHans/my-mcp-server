@@ -74,7 +74,7 @@ export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
     // @ts-ignore
-    const myMcp = new MyMCP();
+    const myMcp = new MyMCP(ctx, env);
     //pass down the env to the mcp server
     myMcp.setEnv(env);
     if (url.pathname === '/sse' || url.pathname === '/sse/message') {
