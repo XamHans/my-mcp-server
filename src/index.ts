@@ -9,11 +9,11 @@ export interface Env {
 }
 
 // Define our MCP agent with tools
-export class MyMCP extends McpAgent<Env> {
+export class MyMCP extends McpAgent {
   // The constructor should call super with ctx and env
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-  }
+  // constructor(ctx: DurableObjectState, env: Env) {
+  //   super(ctx, env);
+  // }
 
   server = new McpServer({
     name: 'Authless Calculator',
@@ -27,7 +27,7 @@ export class MyMCP extends McpAgent<Env> {
       { a: z.number(), b: z.number() },
       async ({ a, b }) => {
         // Access environment variables through 'this' context
-        console.log('DB URL:', this.env.DB_URL);
+        console.log('DB URL:', (this.env as any).DB_URL);
         return {
           content: [{ type: 'text', text: String(a + b) }],
         };
