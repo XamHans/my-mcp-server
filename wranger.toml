@@ -1,0 +1,7 @@
+name = "my-mcp-server"
+
+[vars]
+DB_URL = "https://prod.db.example.com"
+
+[env.dev]
+vars = { DB_URL = "https://dev.db.example.com" }
