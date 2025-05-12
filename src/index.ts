@@ -16,7 +16,6 @@ export class MyMCP extends McpAgent {
       { a: z.number(), b: z.number() },
       async ({ a, b }) => {
         // Access environment variables through 'this' context
-        console.log('DB URL:', (this.env as any).DB_URL);
         return {
           content: [{ type: 'text', text: String(a + b) }],
         };
@@ -35,9 +34,9 @@ export class MyMCP extends McpAgent {
         let result: number;
         console.log('Operation:', operation);
         console.log('Numbers:', a, b);
+        console.log('DB URL:', (this.env as any).DB_URL);
 
         // Access environment through 'this' context
-        console.log('DB URL:', (this.env as any).DB_URL);
 
         switch (operation) {
           case 'add':
