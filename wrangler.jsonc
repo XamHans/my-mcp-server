@@ -43,7 +43,7 @@
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
-  "vars": { "DB_URL": "https://production.value.db" }
+  "vars": { "DB_URL": "https://production.value" }
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/

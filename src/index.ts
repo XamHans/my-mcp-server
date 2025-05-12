@@ -2,8 +2,12 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { McpAgent } from 'agents/mcp';
 import { z } from 'zod';
 
+interface Env {
+  DB_URL: string;
+}
+
 // Define our MCP agent with tools
-export class MyMCP extends McpAgent {
+export class MyMCP extends McpAgent<Env> {
   server = new McpServer({
     name: 'Authless Calculator',
     version: '1.0.0',
@@ -34,7 +38,7 @@ export class MyMCP extends McpAgent {
         let result: number;
         console.log('Operation:', operation);
         console.log('Numbers:', a, b);
-        console.log('DB URL:', (this.env as any).DB_URL);
+        console.log('DB URL:', this.env.DB_URL);
 
         // Access environment through 'this' context
 
